@@ -25,5 +25,8 @@ module SampleApp
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
     config.assets.precompile += %w(*.png *.jpg *jpeg *.gif)
+
+    #Added to make RSPEC tests clearer (get rid of extra text)
+    I18n.enforce_available_locales = true
   end
 end
