@@ -1,0 +1,15 @@
+<!--Display the username and corresponding email addres-->
+<!--Set the title equal to the username-->
+<% provide(:title, @user.name) %>
+<!--Create a header with the value of the username-->
+<div class="row">
+	<aside class="span4">
+		<section>
+			<h1>
+				<!--include the user's avatar and username in the header-->
+				<%= gravatar_for @user %>
+				<%= @user.name %>
+			</h1>
+		</section>
+	</aside>
+</div>

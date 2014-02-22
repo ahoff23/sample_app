@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title><%= full_title(yield(:title)) %></title>
-  <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
-  <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
-  <%= csrf_meta_tags %>
- <%= render 'layouts/shim' %>
-</head>
+	<head>
+		<!--Function to get the page title-->
+  		<title><%= full_title(yield(:title)) %></title>
+  		<%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
+  		<%= javascript_include_tag "application", "data-turbolinks-track" => true %>
+  		<%= csrf_meta_tags %>
+  		<!--layout for IE 9-->
+ 		<%= render 'layouts/shim' %>
+	</head>
 <body>
+	<!--Render the header layout at the top of every page-->
 	<%= render 'layouts/header' %>
 	<div class="container">
+		<!--Create a flash. This takes a key and value for the top of every page.
+		If a key is passed, it is inserted in the form: alert alert-'key'
+		Then the value is printed on the page at the top of the body-->
+		<% flash.each do |key, value| %>
+			<div class="alert alert-<%= key %>"><%= value %></div>
+		<% end %>
+		<!--Insert the HTML for the given page here-->
 		<%= yield %>
+		<!--Render the footer layout at the bottom of every page-->
 		<%= render 'layouts/footer' %>
+		<%= debug(params) if Rails.env.development? %>
 	</div>
 </body>
 </html>

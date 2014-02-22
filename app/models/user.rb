@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
 	#Convert email to entirely lower case before saving to the database
-	before_save { self.email = email.downcase }
+	before_save { email.downcase! }
 
 	#Validate that :name exists, has at most 50 characters
 	#and is unique (CASE SENSITIVE)
@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
 
 	#Create a format for emails: (Word,-,.)+@+(a-z,digits,-,.)
 	#+(.)+(a-z) (NOT CASE SENSITIVE)
-	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
 
 	#Validate that :email exists, has a format according to VALID_EMAIL_REGEX
 	#and that it is unique (NOT CASE SENSITIVE)

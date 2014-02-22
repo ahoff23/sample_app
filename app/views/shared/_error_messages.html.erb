@@ -1,0 +1,20 @@
+<!--Partial file for error messages-->
+<% if @user.errors.any? %>
+	<!--Rails automatically includes fields with errors in divs with CSS class field_with_errors.
+	This allow us to use Sass' @extend functionality to take advantage of bootstrap features-->
+	<div id="error explanation">
+		<!--div which displas the number of errors-->
+		<div class="alert alert-error">
+			<!--pluralize takes the second term, "error" and pluralizes it if necessary and inserts the count of errors before i.e. 6 errors-->
+			The form contains <%= pluralize(@user.errors.count, "error") %>
+		</div>
+		<!--unordered list of all errors-->
+		<ul>
+			<!--Use a do loop for each element of @user.errors.full_messages
+			Place each error message in a temporary variable, msg-->
+			<% @user.errors.full_messages.each do |msg| %>
+				<li> <%= msg %></li>
+			<% end %>
+		</ul>
+	</div>
+<% end %>

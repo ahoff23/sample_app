@@ -1,3 +1,4 @@
+#Spec test for the User model (i.e. actual users, not views)
 require 'spec_helper'
 
 describe User do
@@ -81,6 +82,21 @@ describe User do
   		end
 
   		it { should_not be_valid }
+  	end
+
+  	#Makes sure that email addresses are saved entirely lower case
+  	#First, create a temporary email address with mixed cases
+  	#Then set @user's email to the temporary email and save to db
+  	#Reload @user's email address and make sure it equals the 
+  	#temporary email address entirely in lower case
+  	describe "email address with mixed case" do
+  		let(:mixed_case_email) { "Foo@ExAMPLe.CoM" }
+
+  		it "Should be saved as all-lower case" do
+  			@user.email = mixed_case_email
+  			@user.save
+  			expect(@user.reload.email).to eq mixed_case_email.downcase
+  		end
   	end
 
   	#PASSWORD AUTHENTICATION

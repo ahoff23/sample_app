@@ -1,8 +1,11 @@
 SampleApp::Application.routes.draw do
-  #Will be removed in chapter 7 -> Why does it need to stay?
-  get "users/new"
+  #Creates routes to various actions on the User resource such as creation, deletion, etc.
+  resources :users
 
+  #Root page is static_pages/home
   root 'static_pages#home'
+
+  #Match URL/home to the route static_pages/home via 'get'
   match '/home',    to: 'static_pages#home',    via: 'get'
   match '/help',    to: 'static_pages#help',    via: 'get'
   match '/about',   to: 'static_pages#about',   via: 'get'
