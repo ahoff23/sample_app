@@ -14,7 +14,13 @@ class UsersController < ApplicationController
   #Create a new user based on parameters passed from the signup page
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   #NOTE: When creating a user signup page, you must deploy with SSL production
-  #in oder to ensure user security (See chapter 7 of RoR Tutorial)
+  #in oder to ensure user security (See end of chapter 7 of RoR Tutorial)
+  #Uncomment 'config.force_ssl = true' in config/environments/production.rb
+  #and when pushing to Heroku type: git commit -a -m "Add SSL in production"
+  #then: git push heroku. then: heroku run rake db:migrate. then: heroku open
+  #this will cause the http:// to become https://
+  #This process is different if you are not using Heroku. Heroku's website
+  #has an explanation of how to perform SSL production without Heroku
   #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   def create
     #Create a new user whose parameters are defined using strong parameters defined below
