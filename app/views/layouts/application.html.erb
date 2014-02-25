@@ -17,7 +17,7 @@
 		If a key is passed, it is inserted in the form: alert alert-'key'
 		Then the value is printed on the page at the top of the body-->
 		<% flash.each do |key, value| %>
-			<div class="alert alert-<%= key %>"><%= value %></div>
+			<%= content_tag(:div, value, class: "alert alert-#{key}") %>
 		<% end %>
 		<!--Insert the HTML for the given page here-->
 		<%= yield %>

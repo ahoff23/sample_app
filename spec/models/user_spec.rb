@@ -22,6 +22,12 @@ describe User do
   	#Test to make sure @user has a password and a confirmation password
   	it { should respond_to(:password) }
   	it { should respond_to(:password_confirmation) }
+    
+    #Sign in tests (remember that the user is signed in and authenticated)
+    #Must generate a remember token by 'rails generate migration add_remember_token_to users'
+    #Fill in migration with add_column and add_index (RoR Tutorial Chapter 8.2)
+    it { should respond_to(:remember_token) }
+    it { should respond_to(:authenticate) }
 
   	#Test the validity of @user
   	it { should be_valid }
@@ -160,4 +166,14 @@ describe User do
   		before { @user.password = @user.password_confirmation = "a" * 5 }
   		it { should be_invalid}
   	end
+
+    #Save the user to the databse and make sure that it has a 
+    #remember_token
+    describe "remember token" do
+      before { @user.save }
+      #'its' applies the test to the attribute in parentheses rather
+      #than the subject (page). In this case we are testing the 
+      #:remember_token, not the page, so use 'its'.
+      its(:remember_token) { should_not be_blank }
+    end
 end

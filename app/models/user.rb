@@ -1,6 +1,9 @@
 class User < ActiveRecord::Base
 	#Convert email to entirely lower case before saving to the database
+	#email.downcase! is equivalent to self.email=self.downcase
 	before_save { email.downcase! }
+	#Before creating a User, run the function create_remember_token
+	before_create :create_remember_token
 
 	#Validate that :name exists, has at most 50 characters
 	#and is unique (CASE SENSITIVE)
@@ -21,4 +24,22 @@ class User < ActiveRecord::Base
 
 	#Set a minimum length for a password
 	validates :password, length: { minimum: 6 }
+
+	#Generate a base 64 16 digit token
+	def User.new_remember_token
+		SecureRandom.urlsafe_base64
+	end
+
+	def User.encrypt(token)
+		Digest::SHA1.hexdigest(token.to_s)
+	end
+	
+	private
+
+		#Create a token for this user. Called before creating the user
+		#Set as private because it is only called within the user model
+		def create_remember_token
+			self.remember_token = User.encrypt(User.new_remember_token)
+		end
+	#END PRIVATE BLOCK
 end

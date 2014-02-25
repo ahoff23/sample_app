@@ -27,6 +27,8 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     #If save is successful...
     if @user.save
+      #Sign the user in
+      sign_in @user
       #Create and submit a flash hash which displays a welcome message to the user
       #on the redirected page
       flash[:success] = "Welcome to the Sample App!"
