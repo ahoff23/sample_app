@@ -1,0 +1,14 @@
+<!--Create a title and provide it as a variable for the header layout-->
+<% provide(:title, 'All users') %>
+<h1>All users</h1>
+
+<!--Begin paginated section-->
+<%= will_paginate %>
+
+<ul class="users">
+		<!--render the partial under the file name _user.html.erb for every user in @users-->
+		<%= render @users %>
+</ul>
+
+<%= will_paginate %>
+<!--End pagiated section-->

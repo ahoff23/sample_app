@@ -8,7 +8,7 @@
 					<li><%= link_to "Help",	help_path %></li>
 					<!--These links change depending on whether or not the user is currently signed in-->
 					<% if signed_in? %>
-						<li><%= link_to "Users", '#' %></li>
+						<li><%= link_to "Users", users_path %></li>
 						<!--This list element is a dropdown menu for "Account"-->
 						<!--FOR DROPDOWN MENUS YOU MUST ADD BOOTSTRAP'S JAVASCRIPT LIBRARY
 						SEE APPLICATION.JS. COMMENTED WITH "ADD BOOTSTRAP JAVASCRIPT LIBRARY"-->
@@ -17,7 +17,7 @@
 							<!--Elements in the dropdown menu-->
 							<ul class="dropdown-menu">
 								<li><%= link_to "Profile", current_user %></li>
-								<li><%= link_to "Settings", '#' %></li>
+								<li><%= link_to "Settings", edit_user_path(current_user) %></li>
 								<!--Divider in the dropdown menu before the 'Sign Out' option-->
 								<li class="divider"></li>
 								<li><%= link_to "Sign out", signout_path, method: "delete" %></li>

@@ -49,4 +49,30 @@ module SessionsHelper
 		#this is necessary without a redirect
 		self.current_user = nil
 	end
+
+	#Returns true if parameter user is equal to the current_user, otherwise return false
+	def current_user?(user)
+		user == current_user
+	end
+
+
+  #********************************************************
+  #FRIENDLY REDIRECT
+  #********************************************************
+  #Redirect back to the stored location 'return_to' or the default if 'return_to'
+  #does not exist
+  def redirect_back_or(default)
+  	redirect_to(session[:return_to] || default)
+  	#Delete the stored location because it has already been redirected to
+  	#If you do not include this, any further sign ins before browser close will redirect
+  	#to the stored location
+  	session.delete(:return_to)
+  end
+
+  #Store the return location in a hash of the session object
+  def store_location
+  	#Store the request url if it exists (only for a GET request because you do not 
+  	#want to redirect to a user update, the user should have to re-enter information)
+  	session[:return_to] = request.url if request.get?
+  end
 end

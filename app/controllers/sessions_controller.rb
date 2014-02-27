@@ -12,7 +12,9 @@ def create
 			sign_in user
 			#When using redirect, redirecting to variable object name
 			#redirects the viewer to the 'show' function of that object
-			redirect_to user
+			#unless a protected page was attempted to be viewed, in which case it will
+			#redirect to the stored page
+			redirect_back_or user
 	else
 		#Send a flash error
 		flash.now[:error] = 'Invalid email/password combination'

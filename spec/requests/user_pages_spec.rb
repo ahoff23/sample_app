@@ -5,6 +5,69 @@ require 'spec_helper'
 describe "User Pages" do
   subject { page }
 
+  #Test for index view content
+  describe "index" do
+    #Create a FactoryGirl
+    let(:user) { FactoryGirl.create(:user) }
+    #Before each test, sign the user in and go to the users path
+    before(:each) do
+      sign_in user
+      visit users_path
+    end
+
+    #Make sure title and basic content are functional
+    it { should have_title('All users') }
+    it { should have_content('All users') }
+
+    describe "pagination" do
+      #Before all tests in "pagination" block, create 30 users
+      before(:all)  { 30.times { FactoryGirl.create(:user)} }
+      #At the end of the block, delete all users
+      after(:all)   { User.delete_all }
+
+      #It should have a pagination bar somewhere on the page
+      it { should have_selector('div.pagination') }
+
+      #Go through each page, and you should find one instance of the user's name
+      #in a list item, 'li'
+      it "should list each user" do
+        User.paginate(page: 1).each do |user|
+          expect(page).to have_selector('li', text: user.name)
+        end
+      end
+    end
+
+    #Tests for delete links on the index page
+    describe "delete links" do
+      #user is currently not an admin, so the user should not see any delete buttons
+      it { should_not have_link('delete') }
+
+      describe "as an admin user" do
+        #Create a user variable, admin, which has its admin attribute set to true
+        let(:admin) { FactoryGirl.create(:admin) }
+        #Sign the admin in and go to the index page
+        before do
+          sign_in admin
+          visit users_path
+        end
+
+        #There should be a link called delete which links to the first user show page
+        it { should have_link('delete', href: user_path(User.first)) }
+
+        #Click the delete button and make sure the User count decreases by 1
+        it "should be able to delete another user" do
+          expect do
+            #Click the first delete link on the page
+            click_link('delete', match: :first)
+          #Expect the User count to decrease by one at the end of the expect block
+          end.to change(User, :count).by(-1)
+        end
+        #Make sure the admin does not have a delete button for itself
+        it { should_not have_link('delete', href: user_path(admin)) }
+      end
+    end
+  end
+
 	describe "signup page" do
     	before { visit signup_path }
 
@@ -123,9 +186,6 @@ describe "User Pages" do
       #Create a user variable through a Factory
       let(:user) { FactoryGirl.create(:user) }
 
-      #Create an account for a user with valid information
-      before { valid_signup(user) }
-
       #Fill in the fields again with the same email address and submit
       before do
         fill_in "Name",         with: user.name
@@ -156,6 +216,62 @@ describe "User Pages" do
         before { click_button submit }
         it { should have_content('Email is invalid') }
       end
+    end
+  end
+
+  #********************************************************
+  #EDIT USER INFORMATION TESTS
+  #********************************************************
+
+  describe "edit" do
+    #Create a user in the database 
+    let(:user) { FactoryGirl.create(:user) }
+    #Sign the user in. Users should not be able to edit information without
+    #signing in beforehand
+    before do 
+      sign_in user 
+      #Go to edit user page
+      visit edit_user_path(user)
+    end
+
+    #Basic page display tests
+    describe "page" do
+      it { should have_content("Update your profile") }
+      it { should have_title("Edit user") }
+      #Link for changing gravatar image
+      it { should have_link('change', href:'http://gravatar.com/emails') }
+    end
+
+    #Input invalid information (i.e. nothing) and make sure an error is printed
+    describe "with invalid information" do
+      before { click_button "Save changes" }
+      it { should have_content('error') }
+    end
+
+    describe "with valid information" do
+      #Create variables for a new name and email
+      let(:new_name) { "New Name" }
+      let(:new_email) { "new@example.com" }
+
+      #Edit the user data and submit (password is the same as before!)
+      before do
+        fill_in "Name",              with: new_name
+        fill_in "Email",             with: new_email
+        fill_in "Password",          with: user.password
+        fill_in "Confirm Password",  with: user.password
+        click_button "Save changes"
+      end
+
+      #Redirect to user page i.e. updated name as title
+      it { should have_title(new_name) }
+      #Flash signifying successful information change
+      it { should have_selector('div.alert.alert-success') }
+      #Make sure the user is still logged in
+      it { should have_link('Sign out', href: signout_path) }
+      #Reload the user name and email and make sure they match the name
+      #and email in the input data
+      specify { expect(user.reload.name).to eq new_name }
+      specify { expect(user.reload.email).to eq new_email }
     end
   end
 end

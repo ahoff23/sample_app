@@ -1,0 +1,31 @@
+<!--Create a title variable for the function called in the application layout to use-->
+<% provide(:title, "Edit user") %>
+<h1>Update your profile</h1>
+
+<div class="row">
+	<div class="span5 offset3">
+		<!--Rails uses the new_record? function to check whether or not @user exists in the database. If it does, then this is an edit function, which it should be. You cannot get to the eidt page without a valid user id, so this page can never be used to create a new user-->
+		<!--@user defined in function definition in User controller-->
+		<%= form_for(@user) do |f| %>
+			<!--print any error messages-->
+			<%= render 'shared/error_messages' %>
+
+			<%= f.label :name %>
+			<%= f.text_field :name %>
+
+			<%= f.label :email %>
+			<%= f.text_field :email %>
+
+			<%= f.label :password %>
+			<%= f.password_field :password %>
+
+			<%= f.label :password_confirmation, "Confirm Password" %>
+			<%= f.password_field :password_confirmation %>
+
+			<%= f.submit "Save changes", class: "btn btn-primary" %>
+		<% end %>
+
+		<%= gravatar_for @user %>
+		<a href="http://gravatar.com/emails">change</a>
+	</div>
+</div>

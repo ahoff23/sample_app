@@ -1,0 +1,10 @@
+<!--Create a list element containing the users gravatar image and a link to the user's show page-->
+<li>
+	<%= gravatar_for user, size: 52 %>
+	<%= link_to user.name, user %>
+	<!--If the user is an admin and the current_user is not user (this only prevents an admin from not deleting own account; can delete other admins) display a delete link-->
+	<% if current_user.admin? && !current_user?(user) %>
+		|	<%= link_to "delete", user, method: :delete, data: { confirm: "You sure?" } %>
+	<% end %>
+
+</li>

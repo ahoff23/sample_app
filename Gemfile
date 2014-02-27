@@ -4,6 +4,12 @@ source 'https://rubygems.org'
 gem 'rails', '4.0.2'
 gem 'bootstrap-sass', '2.3.2.0'
 gem 'bcrypt-ruby', '3.1.2'
+#gem for generating realistic names for sample users
+gem 'faker', '1.1.2'
+#gems for pagination. Include the first for general pagination and the second
+#to use the pagination package included in bootstrap
+gem 'will_paginate', '3.0.4'
+gem 'bootstrap-will_paginate', '0.0.9'
 
 group :development, :test do
   gem 'sqlite3', '1.3.8'

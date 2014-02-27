@@ -1,4 +1,11 @@
 class UsersController < ApplicationController
+  #Only allow edit and update functions after running 'signed_in_user' function (private)
+  before_action :signed_in_user, only: [:edit, :update, :index, :destroy]
+  #Only allow edit and update functions after running 'correct_user' function (private)
+  before_action :correct_user, only: [:edit, :update]
+  #Only allow admins to issue a DELETE request (admin_user function can be found in private)
+  before_action :admin_user,  only: :destroy
+
   #controller for the 'show' view
   #finds a user based on a given param ([:id]) and create a variable to trakc it
   def show
@@ -39,6 +46,40 @@ class UsersController < ApplicationController
     end
   end
 
+  def edit
+    #Remove @user = User.find(params[:id]) because it was moved to correct_user (private)
+  end
+
+  #Update the user information
+  def update 
+    #Remove @user = User.find(params[:id]) because it was moved to correct_user (private)
+    #Update attributes with user_params (strong parameter)
+    if @user.update_attributes(user_params)
+      #Flash success and redirect to user page
+      flash[:success] = "Profile updated"
+      redirect_to @user
+    else
+      #Render edit (HTML, NOT FUNCTION) which renders errors, so those should be printed
+      render 'edit'
+    end
+  end
+
+  #Displays all users
+  def index
+    #Create a variable containing all users on the page in the param
+    @users = User.paginate(page: params[:page])
+  end
+
+  #Delete a user
+  def destroy
+    #find the user in the database and delete the user
+    User.find(params[:id]).destroy
+    #Flash a success message
+    flash[:success] = "User deleted."
+    #Redirect to user index
+    redirect_to users_url
+  end
+
   private
 
   #Define parameters that can be passed to a newly created user
@@ -46,5 +87,27 @@ class UsersController < ApplicationController
     params.require(:user).permit(:name, :email, :password, :password_confirmation)
   end
 
+  #Before edits or updates, make sure user is signed in
+  def signed_in_user
+    unless signed_in?
+      #If the user is not signed in, store the location of the most recent GET request
+      #which means that store location will do nothing for an update PATCH
+      store_location
+      redirect_to signin_url, notice: "Please sign in." 
+    end
+  end
 
+  #Create @user (NEEDED FOR UPDATE FUNCTION) and redirect to homepage unless the
+  #current user is the correct user
+  def correct_user
+    #params[:id] is a hash based on the current update or user page i.e. users/id
+    @user = User.find(params[:id])
+    #current_user? can be found in the Session helper
+    redirect_to(root_url) unless current_user?(@user)
+  end
+
+  def admin_user
+    #If the user is not an admin, redirect to the homepage
+    redirect_to(root_url) unless current_user.admin?
+  end
 end
