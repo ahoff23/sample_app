@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+	#Contains microposts and destroys associated microposts if the user is destroyed
+	has_many :microposts, dependent: :destroy
 	#Convert email to entirely lower case before saving to the database
 	#email.downcase! is equivalent to self.email=self.downcase
 	before_save { email.downcase! }
@@ -32,6 +34,14 @@ class User < ActiveRecord::Base
 
 	def User.encrypt(token)
 		Digest::SHA1.hexdigest(token.to_s)
+	end
+
+	#Create an array of microposts (currently only the user's microposts)
+	def feed
+		#All microposts with the user's id. User ? for security (id is properly escaped)
+		#This passes only an integer to the database rather than a variable which can be 
+		#exploited through SQL injection
+		Micropost.where("user_id = ?", id)
 	end
 	
 	private

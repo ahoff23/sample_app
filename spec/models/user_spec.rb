@@ -8,7 +8,7 @@ describe User do
 	before do
 		@user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar")
 	end
-  	
+		
 	#SET SUBJECT FOR TESTS
 	#Set the subjecto of further test to @user
 	subject { @user }
@@ -28,6 +28,12 @@ describe User do
   #Fill in migration with add_column and add_index (RoR Tutorial Chapter 8.2)
   it { should respond_to(:remember_token) }
   it { should respond_to(:authenticate) }
+
+  #Each user should have associated microposts (even if empty, it still has
+  #the column in its database row)
+  it { should respond_to(:microposts) }
+  #Each user should have an associated feed
+  it { should respond_to(:feed) }
 
   #********************************************************
   #Admin authentication tests
@@ -196,5 +202,61 @@ describe User do
     #than the subject (page). In this case we are testing the 
     #:remember_token, not the page, so use 'its'.
     its(:remember_token) { should_not be_blank }
+  end
+
+
+  #********************************************************
+  #Micropost tests
+  #********************************************************
+  describe "micropost associations" do
+  	#Save the user to the datbase
+  	before { @user.save }
+  	#Create two microposts and initialize them immediately
+  	let!(:older_micropost) do
+  		FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
+  	end
+  	let!(:newer_micropost) do
+  		FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago)
+  	end
+
+  	#Convert @user's microposts to an array and make sure they equal an array with
+  	#the newer micropost as teh first element
+  	it "should have the right microposts in the right order" do
+  		#By checking the array, you also make sure the has_many identifier works
+  		expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]
+  	end
+
+  	it "should destroy associated microposts" do
+		#Create a micropost array storing the users microposts
+		microposts = @user.microposts.to_a
+		#Destroy the user
+		@user.destroy
+		#Make sure the array was not cleared in the deletion process
+		expect(microposts).not_to be_empty
+		#For each element in the array, make sure associated micropost in the database is empty
+		microposts.each do |micropost|
+			#Search for a corresponding micropost in the Micropost database (use
+			#where instead of find because it returns an empty object if the user is not found.
+			#This is important because the user should not be in the database, so you are looking
+			#for empty objects in this case)
+			expect(Micropost.where(id: micropost.id)).to be_empty
+		end
+  	end
+
+
+  	describe "status" do
+  		#Create a post not saved so that it is not displayed on the user homepage
+  		#User is a new user
+  		let(:unfollowed_micropost) do
+  			FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
+  		end
+
+  		#feed should include the first two microposts, but not the unsaved one
+  		#include checks if an array includes a given element (so feed is
+  		# an array of microposts)
+  		its(:feed) { should include(older_micropost) }
+  		its(:feed) { should include(newer_micropost) }
+  		its(:feed) { should_not include(unfollowed_micropost) }
+  	end
   end
 end

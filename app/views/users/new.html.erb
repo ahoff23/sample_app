@@ -11,25 +11,7 @@
 		@user must be created as a new variable in the user controller
 		with the form @user=User.new-->
 		<%= form_for(@user) do |f| %>
-			<!--Render an error message if one exists
-			Renders the partial 'shared/error_messages'-->
-			<!--Because we user the 'shared' directory, we must also create a 'shared'
-			view directory and a partial file (in the 'shared' directory)-->
-			<%= render 'shared/error_messages' %>
-
-			<!--Create labels and appropriate text fields for the :name attributes-->
-			<%= f.label :name %>
-			<%= f.text_field :name %>
-
-			<%= f.label :email %>
-			<%= f.text_field :email %>
-
-			<%= f.label :password %>
-			<%= f.password_field :password %>
-
-			<%= f.label :password_confirmation, "Confirmation" %>
-			<%= f.password_field :password_confirmation %>
-
+			<%= render 'shared/fields', f: f %>
 			<%= f.submit "Create my account", class: "btn btn-large btn-primary" %>
 		<% end %>
 	</div>

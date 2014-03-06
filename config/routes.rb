@@ -3,6 +3,9 @@ SampleApp::Application.routes.draw do
   resources :users
   #Resoure for Session controller
   resources :sessions, only: [:new, :create, :destroy]
+  #Because microposts' interfaces are run through User and StaticPages controllers, we
+  #do not need to include new or edit
+  resources :microposts, only: [:create, :destroy]
 
   #Root page is static_pages/home
   root 'static_pages#home'

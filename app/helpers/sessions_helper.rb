@@ -55,6 +55,15 @@ module SessionsHelper
 		user == current_user
 	end
 
+	#Before edits or updates, make sure user is signed in
+  	def signed_in_user
+	 	unless signed_in?
+    	#If the user is not signed in, store the location of the most recent GET request
+      	#which means that store location will do nothing for an update PATCH
+      	store_location
+      	redirect_to signin_url, notice: "Please sign in." 
+	    end
+  	end	
 
   #********************************************************
   #FRIENDLY REDIRECT

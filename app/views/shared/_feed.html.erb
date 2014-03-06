@@ -1,0 +1,10 @@
+<!--Partial for displaying a status feed-->
+<!--Only display if there are any microposts in the feed-->
+<% if @feed_items.any? %>
+	<!--All individual microposts are individuall rendered in another partial, but are placed in an ordered list-->
+	<ol class="microposts">
+		<!--collection is passed so each @feed_items element is processed by the partial individually-->
+		<%= render partial: 'shared/feed_item', collection: @feed_items %>
+	</ol>
+	<%= will_paginate @feed_items %>
+<% end %>

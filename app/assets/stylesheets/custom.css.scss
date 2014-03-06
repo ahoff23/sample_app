@@ -1,7 +1,7 @@
 @import "bootstrap";
 
 /* mixins, variables. etc.*/
-$grayMediumLight: #eaeaea;
+$grayMediumLight: #A0A0A0;
 
 @mixin box_sizing {
 	-moz-box-sizing: border-box;
@@ -189,5 +189,43 @@ input {
 		&:last-child {
 			border-bottom: 1px solid #d7d7d7;
 		}
+	}
+}
+
+/* microposts */
+
+/*micropost ordered list */
+.microposts {
+	/* No list style = No number! (?) */
+	list-style: none;
+	margin: 10px 0 0 0;
+
+	li {
+		padding: 10px 0;
+		border-top: 1p solid #e8e8e8
+	}
+}
+
+/* micropost content */
+.content{
+	display: block;
+}
+
+/*micropost timestamp */
+.timestamp {
+	color: $grayMediumLight;
+}
+
+/* gravatar in User show page */
+.gravatar {
+	float: left;
+	margin-right: 10px;
+}
+
+/* All asides */
+aside {
+	textarea {
+		height: 100px;
+		margin-bottom: 5px;
 	}
 }

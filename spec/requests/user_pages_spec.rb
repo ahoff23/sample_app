@@ -81,10 +81,24 @@ describe "User Pages" do
 	describe "profile page" do
     #Create a user variable through a Factory
 		let(:user) { FactoryGirl.create(:user) }
+
+    #Create two microposts immediately with let! so that they appear when viewing
+    #the show page (otherwise they would not be created until they were referenced)
+    let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
+    let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
+
 		before { visit user_path(user) }
 
 		it { should have_content(user.name) }
 		it { should have_title(user.name) }
+
+    #Make sure the page displays the microposts
+    describe "microposts" do
+      it { should have_content(m1.content) }
+      it { should have_content(m2.content) }
+      #Also ennsure that the number of microposts the user has is displayed
+      it { should have_content(user.microposts.count) }
+    end
 	end
 
   #Tests which submit information on the signup page and
@@ -111,10 +125,10 @@ describe "User Pages" do
     describe "with valid information" do
       #Fill in the fields
       before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Name",             with: "Example User"
+        fill_in "Email",            with: "user@example.com"
+        fill_in "Password",         with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
       #Check that pressing submit increases the User count by 1
       it "should create a user" do
@@ -170,8 +184,8 @@ describe "User Pages" do
     #confirmation do not match (case sensitive test)
     describe "password/confirmation mismatch" do
       before do
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "Foobar"
+        fill_in "Password",         with: "foobar"
+        fill_in "Confirm Password", with: "Foobar"
       end
 
       before { click_button submit }
@@ -191,7 +205,7 @@ describe "User Pages" do
         fill_in "Name",         with: user.name
         fill_in "Email",        with: user.email
         fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
       before { click_button submit }
       it { should have_content('Email has already been taken') }
@@ -232,6 +246,24 @@ describe "User Pages" do
       sign_in user 
       #Go to edit user page
       visit edit_user_path(user)
+    end
+
+    #Can't change the 'admin' attribute 
+    describe "forbidden attributes" do
+      #Create a params variable to pass to the user update function
+      let(:params) do
+        { user: { admin: true, password: user.password, password_confirmation: user.password } }
+      end
+
+      #Sign the user in and set capybara to false (capybara doesn't allow patch requests)
+      before do
+        sign_in user, no_capybara: true
+        #Call the UPDATE function with params, this is how you update a user without
+        #using a view/form
+        patch user_path(user), params
+      end
+      #Expect admin to still be false (it was initially false because you used create(:user))
+      specify { expect(user.reload).not_to be_admin }
     end
 
     #Basic page display tests

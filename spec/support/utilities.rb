@@ -34,3 +34,12 @@ def sign_in(user, options={})
 		click_button "Sign in"
 	end
 end
+
+#Sign user out
+def sign_out
+	#Visit the homepage. Although all pages should have the header with the
+	#sign out option, the app may change in the future
+	visit root_path
+	#Sign the user out
+	click_link "Sign out"
+end

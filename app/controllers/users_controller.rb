@@ -5,11 +5,18 @@ class UsersController < ApplicationController
   before_action :correct_user, only: [:edit, :update]
   #Only allow admins to issue a DELETE request (admin_user function can be found in private)
   before_action :admin_user,  only: :destroy
+  #Only allow non-signed in users to create a new users
+  before_action :signed_out_user, only: [:new, :create]
+  #Do not allow admin to delete themselves
+  before_action :admin_no_self_delete, only: [:destroy]
 
   #controller for the 'show' view
   #finds a user based on a given param ([:id]) and create a variable to trakc it
   def show
   	@user = User.find(params[:id])
+    #Create a variable containing all microposts for the show view
+    #Must create a microposts view folder and a _micropost.html.erb file for partial
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
 
   #Creates a new user temporarily for the signup page
@@ -84,17 +91,7 @@ class UsersController < ApplicationController
 
   #Define parameters that can be passed to a newly created user
   def user_params
-    params.require(:user).permit(:name, :email, :password, :password_confirmation)
-  end
-
-  #Before edits or updates, make sure user is signed in
-  def signed_in_user
-    unless signed_in?
-      #If the user is not signed in, store the location of the most recent GET request
-      #which means that store location will do nothing for an update PATCH
-      store_location
-      redirect_to signin_url, notice: "Please sign in." 
-    end
+      params.require(:user).permit(:name, :email, :password, :password_confirmation)
   end
 
   #Create @user (NEEDED FOR UPDATE FUNCTION) and redirect to homepage unless the
@@ -109,5 +106,22 @@ class UsersController < ApplicationController
   def admin_user
     #If the user is not an admin, redirect to the homepage
     redirect_to(root_url) unless current_user.admin?
+  end
+
+  #If the user is signed in, redirect them (signed in users should not be able
+  #to create a new user)
+  def signed_out_user
+    if signed_in?
+      redirect_to(root_url)
+    end
+  end
+
+  #Admins should not be able to delete themselves
+  def admin_no_self_delete
+    @user = User.find(params[:id])
+    if current_user == @user
+      flash.now[:error] = 'Cannot delete yourself!'
+      redirect_to(root_url)
+    end
   end
 end

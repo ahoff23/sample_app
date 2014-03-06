@@ -25,5 +25,16 @@ namespace :db do
 							password: password,
 							password_confirmation: password)
 		end
+
+		#For the first 6 users add 50 fake microposts
+		users = User.all(limit: 6)
+		#Like a for loop, 50 iterations
+		50.times do
+			#Set content to a fake sentence using Faker
+			content = Faker::Lorem.sentence(5)
+			#For each user (loop through all) create a micropost with content
+			#created in content variable
+			users.each { |user| user.microposts.create!(content: content) }
+		end
 	end	
 end

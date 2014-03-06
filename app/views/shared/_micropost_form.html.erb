@@ -1,0 +1,12 @@
+<!--form for submitting a new micropost (goes to micropost controller's create method)-->
+<%= form_for(@micropost) do |f| %>
+	<!--render the error partial-->
+	<%= render 'shared/error_messages', object: f.object %>
+	<div class="field">
+		<!--Create a text field for the content of the micropost with default text already in it-->
+		<%= f.text_area :content, placeholder: "Compose new micropost..." %>
+	</div>
+	<!--submit button for the form 'f'-->
+	<%= f.submit "Post", class: "btn btn-large btn-primary" %>
+<% end %>
+	

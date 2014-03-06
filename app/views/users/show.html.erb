@@ -12,4 +12,21 @@
 			</h1>
 		</section>
 	</aside>
+	<!--Create a new division for displaying user microposts-->
+	<div class="span8">
+		<!--Do not display an empty list-->
+		<% if @user.microposts.any? %>
+			<!--Display the number of microposts-->
+			<h3>Microposts (<%= @user.microposts.count %>)</h3>
+			<!--Ordered list of microposts-->
+			<ol class="microposts">
+				<!--renders partial, _micropost, using the current array of microposts, @microposts-->
+				<!--@microposts must be defined in the show action of User controller because this is a User view-->
+				<!--Normally you would not have to input the variable, but this is a variable different than the variable of the view's controller-->
+				<%= render @microposts %>
+			</ol>
+			<!--Only display pages at the bottom of the page-->
+			<%= will_paginate @microposts %>
+		<% end %>
+	</div>
 </div>

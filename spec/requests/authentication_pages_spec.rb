@@ -95,6 +95,16 @@ describe "Authentication" do
 			#Create a temporary user
 			let(:user) { FactoryGirl.create(:user) }
 
+			#View when user is not signed in
+			describe "should not display profile and settings links" do
+				before { visit root_path }
+				it { should_not have_link('Users',				href: users_path) }
+				it { should_not have_link('Profile',			href: user_path(user)) }
+				it { should_not have_link('Settings',			href: edit_user_path(user)) }
+				it { should_not have_link('Sign out',			href: signout_path) }
+				it { should 	have_link('Sign in', 			href: signin_path) }
+			end
+
 			#If a user goes to a protected page without signing in, redirect them
 			#to the sign in page, allow them to sign in, and then redirect them
 			#to their intended destination, the edit user page
@@ -115,6 +125,20 @@ describe "Authentication" do
 				describe "after signing in" do
 					it "should render the desired protected page" do
 						expect(page).to have_title('Edit user')
+					end
+				end
+
+				#After signing in and signing out, the stored location should
+				#be deleted. Sign out and then sign in. You should be at the user
+				#profile page
+				describe "when signing in again" do
+					before do
+						sign_out
+						sign_in user
+					end
+
+					it "should render the default (profile) page" do
+						expect(page).to have_title(user.name)
 					end
 				end
 			end
@@ -158,6 +182,55 @@ describe "Authentication" do
 					before { delete user_path(user) }
 					specify { expect(response).to redirect_to(root_url) }
 				end
+			end
+
+			#Authorization rules for manipulating microposts
+			describe "in the Microposts controller" do
+				#Cannot create a micropost unless signed in
+				describe "submitting to the create action" do
+					#Post to microposts_path i.e. create path
+					before { post microposts_path }
+					#Expect a redirect to the sign-in page
+					specify { expect(response).to redirect_to(signin_path) }
+				end
+
+				#Cannot delete a micropost unless signed in
+				describe "submitting to the destroy action" do
+					#Submit a delete request to the micropost_path for a newly created
+					#FactoryGirl micropost
+					before { delete micropost_path(FactoryGirl.create(:micropost)) }
+					#Expect a redirect to the sign-in page
+					specify { expect(response).to redirect_to(signin_path) }
+				end
+			end
+		end
+
+		#Tests for authorization limits for signed in users
+		describe "for signed in users" do
+			let (:user) { FactoryGirl.create(:user) }
+			before { sign_in user, no_capybara: true }
+
+			#Signed in users cannot access new method
+			describe "submitting to the new action" do
+				before { get signup_path }
+				specify { expect(response).to redirect_to(root_url) }
+			end
+
+			#Signed in users cannot access the new method
+			describe "submitting to the create action" do        
+				before 	{ post users_path(user) }
+        		specify { response.should redirect_to(root_path) }
+			end
+		end
+
+		#Admin users should not be able to delete themselves
+		describe "for admin users" do
+			let (:admin) { FactoryGirl.create(:admin) }
+			before { sign_in admin, no_capybara: true }
+
+			describe "should not allow self-deletion" do
+				before { delete user_path(admin) }
+        		specify { response.should redirect_to(root_path) }
 			end
 		end
 	end
