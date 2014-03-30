@@ -44,10 +44,61 @@ describe "Static pages" do
         end
       end
 
+      describe "follower/following counts" do
+        #Create another user
+        let(:other_user) { FactoryGirl.create(:user) }
+        before do
+          #Have the other user follow user
+          other_user.follow!(user)
+          #Go to the user's homepage
+          visit root_path
+        end
+
+        #The page should have a link which says that the user is not following anyone
+          #that leads to the user's following users path
+        it { should have_link("0 following", href: following_user_path(user)) }
+        #The page should have a link which says that the user is being followed by 1 person
+          #and leads to the user's follower path
+        it { should have_link("1 followers", href: followers_user_path(user)) }
+      end
+
       #Test to make sure the feed still appears when a post error occurs
       describe "should still display post feed when invalid data is submitted" do
         before { click_button "Post" }
         it { should have_content("Lorem ipsum") }
+      end
+
+      #Test to make sure that the micropost count line is accurate
+      describe "should display the correct number of microposts" do
+        #First test multiple microposts
+        describe "for multiple microposts" do
+          it { should have_content('2 microposts') }
+        end
+        #Then test one micropost
+        describe "for one micropost" do
+          before { click_link "delete", match: :first }
+          it { should have_content('1 micropost') }       
+        end   
+      end
+
+      #Test to make sure pagination works correctly
+      describe "should paginate properly" do
+        #Create 28 microposts (one page because 2 have already been created)
+        before { 28.times { FactoryGirl.create(:micropost, user: user, content: "Test") } }
+
+        #For one page
+        describe "for 30 microposts" do
+          before { visit root_path }
+          it { should_not have_selector('div.pagination') }
+        end
+
+        #For multiple pages
+        describe "for more than 30 microposts" do
+          #Create one more micropost so that an additional pageis required
+          before { FactoryGirl.create(:micropost, user: user, content: "Test") }
+          before { visit root_path }
+          it { should have_selector('div.pagination') }
+        end
       end
     end
   end

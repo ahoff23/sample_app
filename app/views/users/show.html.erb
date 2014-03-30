@@ -11,9 +11,15 @@
 				<%= @user.name %>
 			</h1>
 		</section>
+		<section>
+			<!--Render the number of following and followed users-->
+			<%= render 'shared/stats' %>
+		</section>
 	</aside>
 	<!--Create a new division for displaying user microposts-->
 	<div class="span8">
+		<!--Display the follow/unfollow option, but only if the user is signed in-->
+		<%= render 'follow_form' if signed_in? %>
 		<!--Do not display an empty list-->
 		<% if @user.microposts.any? %>
 			<!--Display the number of microposts-->

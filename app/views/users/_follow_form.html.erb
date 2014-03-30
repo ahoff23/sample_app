@@ -1,0 +1,11 @@
+<!--Do not display for the user's own show page-->
+<% unless current_user?(@user) %>
+	<div id="follow_form">
+		<!--If the current user is already following the user whose show page is being viewed display an unfollow option, otherwise display a follow option-->
+		<% if current_user.following?(@user) %>
+			<%= render 'unfollow' %>
+		<% else %>
+			<%= render 'follow' %>
+		<% end %>
+	</div>
+<% end %>

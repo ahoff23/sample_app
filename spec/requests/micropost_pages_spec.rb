@@ -54,5 +54,23 @@ describe "Micropost pages" do
 				expect{ click_link "delete" }.to change(Micropost, :count).by(-1)
 			end
 		end
+
+		#Make sure a user does not see delete buttons for microposts of different users
+		describe "link for different users microposts" do
+			#Create a different user to create a micropost for
+			let(:diffuser) { FactoryGirl.create(:user) }
+			before do
+				#Create a micropost for the different user
+				FactoryGirl.create(:micropost, user: diffuser)
+				#Sign the original user in
+				sign_in user
+				#Go to the different user's show page
+				visit users_path(diffuser)
+			end
+			#Make sure that a delete button does not appear on the page
+			it { should_not have_link("delete") }
+			#Make sure the redirect went to the correct user's show page
+			it { should have_content(diffuser.name) }
+		end
 	end
 end

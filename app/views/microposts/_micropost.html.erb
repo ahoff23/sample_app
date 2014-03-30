@@ -1,14 +1,3 @@
 <li>
-	<!--Print the content of the micropost in a span-->
-	<span class="content"><%= micropost.content %></span>
-	<!--Print the time of the post in a different span-->
-	<span class="timestamp">
-		<!--Converts timestamp to words. Dope.-->
-		Posted <%= time_ago_in_words(micropost.created_at) %> ago.
-	</span>
-	<!--IF the current user is the user of micropost in question-->
-	<% if current_user?(micropost.user) %>
-		<!--link to the delete method with a pop up asking if the user is sure-->
-		<%= link_to "delete", micropost, method: :delete, data: { confirm: "You sure?" }, title: micropost.content %>
-	<% end %>
+	<%= render 'microposts/feed_micropost', micropost: micropost %>
 </li>

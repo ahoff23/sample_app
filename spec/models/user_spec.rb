@@ -3,25 +3,25 @@ require 'spec_helper'
 
 describe User do
 
-	#SAMPLE USER
-	#Before, create a sample User, @user
-	before do
-		@user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar")
-	end
-		
-	#SET SUBJECT FOR TESTS
-	#Set the subjecto of further test to @user
-	subject { @user }
+  #SAMPLE USER
+  #Before, create a sample User, @user
+  before do
+  	@user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar")
+  end
+	
+  #SET SUBJECT FOR TESTS
+  #Set the subjecto of further test to @user
+  subject { @user }
 
-	#PARAMETER EXISTANCE TESTS
-	#Test to make sure @user has a :name and :email hash
-	it { should respond_to(:name) }
-	it { should respond_to(:email) }
-	#Test to make sure @user has an encrypted password
-	it { should respond_to(:password_digest) }
-	#Test to make sure @user has a password and a confirmation password
-	it { should respond_to(:password) }
-	it { should respond_to(:password_confirmation) }
+  #PARAMETER EXISTANCE TESTS
+  #Test to make sure @user has a :name and :email hash
+  it { should respond_to(:name) }
+  it { should respond_to(:email) }
+  #Test to make sure @user has an encrypted password
+  it { should respond_to(:password_digest) }
+  #Test to make sure @user has a password and a confirmation password
+  it { should respond_to(:password) }
+  it { should respond_to(:password_confirmation) }
   
   #Sign in tests (remember that the user is signed in and authenticated)
   #Must generate a remember token by 'rails generate migration add_remember_token_to users'
@@ -45,6 +45,23 @@ describe User do
   it { should be_valid }
   #admin? should return false
   it { should_not be_admin }
+
+
+  #********************************************************
+  #Relationships basic tests
+  #********************************************************
+  #Each user should have be in the relationships index
+  it { should respond_to(:relationships) }
+  #The user should also have followed users
+  it { should respond_to(:followed_users) }
+  #The user should have a reverse relationships table
+  it { should respond_to(:reverse_relationships) }
+  #The user should have followers
+  it { should respond_to(:followers) }
+  #The user should respond to the following? function
+  it { should respond_to(:following?) }
+  #The user should respond to the followed! function
+  it { should respond_to(:follow!) }
 
   #Save the user and turn it's admin attribute to true, then ensure that admin
   #returns true
@@ -250,6 +267,15 @@ describe User do
   		let(:unfollowed_micropost) do
   			FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
   		end
+      #Create a user for the user to follow
+      let(:followed_user) { FactoryGirl.create(:user) }
+
+      before do
+        #Have the user follow the 'followed_user'
+        @user.follow!(followed_user)
+        #Create 3 microposts for the followed user
+        3.times { followed_user.microposts.create!(content: "Lorem Ipsum") }
+      end
 
   		#feed should include the first two microposts, but not the unsaved one
   		#include checks if an array includes a given element (so feed is
@@ -257,6 +283,45 @@ describe User do
   		its(:feed) { should include(older_micropost) }
   		its(:feed) { should include(newer_micropost) }
   		its(:feed) { should_not include(unfollowed_micropost) }
+      its(:feed) do
+        #for each of the followed user's microposts, the feed should include
+        followed_user.microposts.each do |micropost|
+          should include(micropost)
+        end
+      end
+  	end
+  end
+
+  #********************************************************
+  #Relationships tests
+  #********************************************************
+  describe "following" do
+  	#Create an other user for @user to follow
+  	let(:other_user) { FactoryGirl.create(:user) }
+  	#Before, save @user and then have @user follow other user
+  	before do
+  		@user.save
+  		@user.follow!(other_user)
+  	end
+  	#It should be following other user
+  	it { should be_following(other_user) }
+  	#Its followed users should include other user
+  	its(:followed_users) { should include(other_user) }
+
+  	describe "followed user" do
+  		#Reset subject to the other user
+  		subject { other_user }
+  		#The other user's followers should include @user
+  		its(:followers) { should include(@user) }
+  	end
+
+  	describe "then unfollow" do 
+  		#Unfollow the user
+  		before { @user.unfollow!(other_user) }
+  		#It should not be followinng the other user
+  		it { should_not be_following(other_user) }
+  		#Its followed users should not include the other user
+  		its(:followed_users) { should_not include(other_user) }
   	end
   end
 end

@@ -1,0 +1,19 @@
+<!--Do nothing if user is not nil, but set it to current user otherwise-->
+<!--This would set @user to itself if on the user show page, but to the current_user otherwise-->
+<% @user ||= current_user %>
+<div class="stats">
+	<!--Link to the following user page-->
+	<a href="<%= following_user_path(@user) %>">
+		<strong id="following" class="stat">
+			<%= @user.followed_users.count %>
+		</strong>
+		following
+	</a>
+	<!--Link to the user's followers page-->
+	<a href="<%= followers_user_path(@user) %>">
+		<strong id="followers" class="stat">
+			<%= @user.followers.count %>
+		</strong>
+		followers
+	</a>
+</div>

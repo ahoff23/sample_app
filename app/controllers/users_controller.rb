@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   #Only allow edit and update functions after running 'signed_in_user' function (private)
-  before_action :signed_in_user, only: [:edit, :update, :index, :destroy]
+  before_action :signed_in_user, only: [:edit, :update, :index, :destroy, :following, :followers]
   #Only allow edit and update functions after running 'correct_user' function (private)
   before_action :correct_user, only: [:edit, :update]
   #Only allow admins to issue a DELETE request (admin_user function can be found in private)
@@ -85,6 +85,30 @@ class UsersController < ApplicationController
     flash[:success] = "User deleted."
     #Redirect to user index
     redirect_to users_url
+  end
+
+  #Function returning all users the user is following
+  def following
+    #Provide a title beause the render applies to both this and followers function
+    @title = "Following"
+    #Find the user in order to collect their followers
+    @user = User.find(params[:id])
+    #Paginate all users in the followed parameter of @user for display
+    @users = @user.followed_users.paginate(page: params[:page])
+    #Render the follower/followed display
+    render 'show_follow'
+  end
+
+  #Function returning all users following the user
+  def followers
+    #Provide a title beause the render applies to both this and following function
+    @title = "Followers"
+    #Find the user in order to collect their followers
+    @user = User.find(params[:id])
+    #Paginate all users in the followed parameter of @user for display
+    @users = @user.followers.paginate(page: params[:page])
+    #Render the follower/followed display
+    render 'show_follow'
   end
 
   private

@@ -153,7 +153,6 @@ describe "Authentication" do
 					it { should have_title('Sign in') }
 				end
 
-
 				describe "submitting to the update action" do
 					#Update the user by patching the update action (can't visit with Capybara)
 					before { patch user_path(user) }
@@ -162,8 +161,22 @@ describe "Authentication" do
 				end
 
 				#Users who are not signed in cannot view the users index
-				describe "visintg the user index" do
+				describe "visiting the user index" do
 					before { visit users_path }
+					it { should have_title('Sign in') }
+				end
+
+				describe "visiting the following page" do
+					#Visit the following link from the homepage
+					before { visit following_user_path(user) }
+					#It should re-route to the sign-in page (user not signed in)
+					it { should have_title('Sign in') }
+				end
+
+				describe "visiting the followers page" do
+					#Visit the follower link from the homepage
+					before { visit followers_user_path(user) }
+					#It should re-route to the sing-in page (user not signed in)
 					it { should have_title('Sign in') }
 				end
 			end
@@ -199,6 +212,26 @@ describe "Authentication" do
 					#Submit a delete request to the micropost_path for a newly created
 					#FactoryGirl micropost
 					before { delete micropost_path(FactoryGirl.create(:micropost)) }
+					#Expect a redirect to the sign-in page
+					specify { expect(response).to redirect_to(signin_path) }
+				end
+			end
+
+			describe "in the Relationships controller" do
+				describe "submitting to the create action" do
+					#Post to the relationships_path i.e. create path
+					before { post relationships_path }
+					#Expect a redirect to sign-in page
+					specify { expect(response).to redirect_to(signin_path) }
+				end
+
+				describe "submitting to the destroy action" do
+					#Submit a delete request to the relationship path for the first
+					#relationship path
+					#Even though this relationship does not necessarily exist,
+					#the redirect should occur before searching for the relationship
+					#so hardcoding this relationship is not necessary
+					before { delete relationship_path(1) }
 					#Expect a redirect to the sign-in page
 					specify { expect(response).to redirect_to(signin_path) }
 				end

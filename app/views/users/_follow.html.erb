@@ -1,0 +1,7 @@
+<!--Create a relationship for the current user with a follower id of the show page-->
+<!--remote allows the create action to use Ajax, so it does not need to change pages-->
+<%= form_for(current_user.relationships.build(followed_id: @user.id), remote: true) do |f| %>
+	<!--You do not display the field but you want it in the form so hide it-->
+	<div><%= f.hidden_field :followed_id %></div>
+	<%= f.submit "Follow", class: "btn btn-large btn-primary" %>
+<% end %>

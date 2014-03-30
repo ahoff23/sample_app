@@ -1,11 +1,20 @@
 SampleApp::Application.routes.draw do
   #Creates routes to various actions on the User resource such as creation, deletion, etc.
-  resources :users
+  resources :users do
+    member do
+      #Creates routes for each user to get the resources followers and users following the user
+      #Creates a route of the form users/{id#}/following and users/{id#}/followers
+      get :following, :followers
+    end
+  end
+
   #Resoure for Session controller
   resources :sessions, only: [:new, :create, :destroy]
   #Because microposts' interfaces are run through User and StaticPages controllers, we
   #do not need to include new or edit
   resources :microposts, only: [:create, :destroy]
+  #Routes for when follow and unfollow buttons are pressed
+  resources :relationships, only: [:create, :destroy]
 
   #Root page is static_pages/home
   root 'static_pages#home'

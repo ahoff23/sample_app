@@ -1,0 +1,21 @@
+<div class="row">
+	<aside class="span4">
+		<section>
+			<!--render user_info partial-->
+			<%= render 'shared/user_info' %>
+		</section>
+		<section>
+			<!--Render the user's follower and following stats-->
+			<%= render 'shared/stats' %>
+		</section>
+		<section>
+			<!--render micropost_form partial-->
+			<%= render 'shared/micropost_form' %>
+		</section>
+	</aside class="span4">
+	<!--Create a division which includes the user's microposts-->
+	<div class="span8">
+		<h3>Micropost feed</h3>
+		<%= render 'shared/feed' %>
+	</div>
+</div>
